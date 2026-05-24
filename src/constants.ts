@@ -134,4 +134,7 @@ export const translations: Translation = {
   service_included: { en: 'What\'s Included', es: 'Qué Incluye' },
   service_for_who: { en: 'Who This Service Is For', es: 'Para Quién es este Servicio' },
   service_why_us: { en: 'Why Choose Waterland Pool\'s', es: '¿Por qué elegir Waterland Pool\'s?' },
+  view_mode_carousel: { en: 'Carousel View', es: 'Modo Carrusel' },
+  view_mode_grid: { en: 'Grid View', es: 'Modo Cuadrícula' },
+  toggle_view: { en: 'Show as', es: 'Mostrar como' },
 };

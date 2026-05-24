@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'motion/react';
 import { serviceData } from '../data/services';
 import CTASection from '../components/CTASection';
+import LightboxModal from '../components/LightboxModal';
 
 export default function Portfolio() {
   const { t } = useLanguage();
+  const [lightbox, setLightbox] = useState<{ isOpen: boolean; initialIndex: number }>({
+    isOpen: false,
+    initialIndex: 0,
+  });
 
   // Generate projects from service galleries
   const projects = Object.entries(serviceData).flatMap(([id, service]) => {
@@ -17,6 +22,8 @@ export default function Portfolio() {
       type: category
     }));
   });
+
+  const allImages = projects.map(p => p.image);
 
   return (
     <div className="pt-20">
@@ -67,7 +74,8 @@ export default function Portfolio() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                className="group relative overflow-hidden rounded-3xl shadow-xl aspect-[4/3]"
+                className="group relative overflow-hidden rounded-3xl shadow-xl aspect-[4/3] cursor-pointer"
+                onClick={() => setLightbox({ isOpen: true, initialIndex: idx })}
               >
                 <img 
                   src={project.image} 
@@ -83,6 +91,15 @@ export default function Portfolio() {
               </motion.div>
             ))}
           </div>
+
+          {/* Fullscreen Showcase Lightbox Carousel */}
+          <LightboxModal
+            isOpen={lightbox.isOpen}
+            onClose={() => setLightbox({ ...lightbox, isOpen: false })}
+            images={allImages}
+            initialIndex={lightbox.initialIndex}
+            title={t('nav_portfolio')}
+          />
 
         </div>
       </section>

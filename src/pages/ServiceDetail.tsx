@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'motion/react';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, LayoutGrid, Sliders } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CTASection from '../components/CTASection';
+import ImageCarousel from '../components/ImageCarousel';
+import LightboxModal from '../components/LightboxModal';
 
 interface ServiceDetailProps {
   title: string;
@@ -17,6 +19,11 @@ interface ServiceDetailProps {
 
 export default function ServiceDetail({ title, subtitle, description, included, forWho, whyUs, gallery }: ServiceDetailProps) {
   const { t } = useLanguage();
+  const [viewMode, setViewMode] = useState<'carousel' | 'grid'>('carousel');
+  const [lightbox, setLightbox] = useState<{ isOpen: boolean; initialIndex: number }>({
+    isOpen: false,
+    initialIndex: 0,
+  });
 
   return (
     <>
@@ -85,27 +92,82 @@ export default function ServiceDetail({ title, subtitle, description, included, 
 
               {gallery && gallery.length > 0 && (
                 <div className="space-y-8 pt-8 border-t border-slate-100">
-                  <h2 className="text-3xl font-bold text-brand-dark">{t('service_gallery')}</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {gallery.map((img, idx) => (
-                      <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: idx * 0.1 }}
-                        className="aspect-[4/3] rounded-2xl overflow-hidden shadow-lg group cursor-pointer relative"
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <h2 className="text-3xl font-bold text-brand-dark">{t('service_gallery')}</h2>
+                    
+                    {/* View Controls */}
+                    <div className="flex bg-slate-100 p-1 rounded-2xl self-start sm:self-auto border border-slate-200">
+                      <button
+                        onClick={() => setViewMode('carousel')}
+                        className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                          viewMode === 'carousel'
+                            ? 'bg-white text-brand-dark shadow-sm'
+                            : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                        id="view-mode-carousel-toggle"
                       >
-                        <img 
-                          src={img} 
-                          alt={`${title} gallery ${idx + 1}`}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                          referrerPolicy="no-referrer"
-                        />
-                        <div className="absolute inset-0 bg-brand-dark/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      </motion.div>
-                    ))}
+                        <Sliders size={14} />
+                        <span>{t('view_mode_carousel')}</span>
+                      </button>
+                      <button
+                        onClick={() => setViewMode('grid')}
+                        className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                          viewMode === 'grid'
+                            ? 'bg-white text-brand-dark shadow-sm'
+                            : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                        id="view-mode-grid-toggle"
+                      >
+                        <LayoutGrid size={14} />
+                        <span>{t('view_mode_grid')}</span>
+                      </button>
+                    </div>
                   </div>
+
+                  {viewMode === 'carousel' ? (
+                    <div className="max-w-3xl mx-auto">
+                      <ImageCarousel 
+                        images={gallery} 
+                        alt={title}
+                        onImageClick={(index) => setLightbox({ isOpen: true, initialIndex: index })}
+                      />
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {gallery.map((img, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          whileInView={{ opacity: 1, scale: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: idx * 0.05 }}
+                          onClick={() => setLightbox({ isOpen: true, initialIndex: idx })}
+                          className="aspect-[4/3] rounded-2xl overflow-hidden shadow-md hover:shadow-xl group cursor-pointer relative"
+                        >
+                          <img 
+                            src={img} 
+                            alt={`${title} gallery ${idx + 1}`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute inset-0 bg-brand-dark/25 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <span className="bg-white/90 backdrop-blur-md text-brand-dark font-medium text-xs px-3 py-1.5 rounded-full shadow-lg scale-90 group-hover:scale-100 transition-transform duration-300">
+                              {t('cta_view_details')}
+                            </span>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Lightbox Modal for gallery viewing */}
+                  <LightboxModal
+                    isOpen={lightbox.isOpen}
+                    onClose={() => setLightbox({ ...lightbox, isOpen: false })}
+                    images={gallery}
+                    initialIndex={lightbox.initialIndex}
+                    title={title}
+                  />
                 </div>
               )}
             </div>
