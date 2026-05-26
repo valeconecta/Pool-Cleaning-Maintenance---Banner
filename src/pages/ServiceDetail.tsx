@@ -31,7 +31,7 @@ export default function ServiceDetail({ title, subtitle, description, included, 
         {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&q=80&w=2000" 
+            src="https://lh3.googleusercontent.com/d/150S7JPsn4A_JDsm3SpAXFZcStANSOKsh" 
             className="w-full h-full object-cover"
             alt={title}
             referrerPolicy="no-referrer"
